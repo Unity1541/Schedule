@@ -1,4 +1,4 @@
-const adminPassword = '123';
+const adminPassword = '1541';
 
 let state = {
   tasks: [
@@ -73,7 +73,7 @@ function render() {
   topBar.className = 'flex justify-between items-center mb-6';
   topBar.innerHTML = `
     <div class="flex items-center gap-3">
-      <h1>專案甘特圖</h1>
+      <h1>藥師國考進度表</h1>
       <span class="badge ${state.viewMode === 'client' ? 'in-progress' : 'completed'}">
         ${state.viewMode === 'client' ? '客戶檢視模式' : '管理員模式'}
       </span>
@@ -150,7 +150,7 @@ function render() {
               <span class="${getStatusClass(task.status)}">${getStatusText(task.status)}</span>
             </div>
             <div class="text-xs text-gray mt-1">${task.startDate} ~ ${task.endDate}</div>
-            <div class="text-xs text-gray mt-1">負責人：${task.assignee}</div>
+            <div class="text-xs text-gray mt-1">主題章節：${task.assignee}</div>
             <div class="flex items-center gap-2 mt-1">
               <div style="background:#e5e7eb;width:80px;height:6px;border-radius:3px;overflow:hidden;">
                 <div style="background:#3b82f6;height:6px;width:${task.progress}%;"></div>
@@ -315,7 +315,7 @@ function showTaskForm(task) {
         </div>
       </div>
       <div class="mb-2">
-        <label>負責人</label>
+        <label>主題章節</label>
         <input id="taskAssignee" value="${task?.assignee || ''}" />
       </div>
       <div class="mb-2">
