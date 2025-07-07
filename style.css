@@ -5,12 +5,15 @@ body {
   padding: 0;
 }
 #app {
+  width: 100%;
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 0 auto;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 12px #0001;
-  padding: 32px;
+  padding: 2vw 2vw 32px 2vw;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 h1 {
   font-size: 2rem;
@@ -155,4 +158,10 @@ button.gray:hover { background: #d1d5db; }
 @media (max-width: 900px) {
   #app { padding: 8px; }
   .gantt-date { min-width: 24px; font-size: 0.7rem; }
+  .flex.gap-4 > div:first-child { width: 100px !important; }
+}
+@media (max-width: 600px) {
+  #app { padding: 2px; }
+  .flex.gap-4 { flex-direction: column; }
+  .flex.gap-4 > div:first-child { width: 100% !important; }
 }
