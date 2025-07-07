@@ -353,7 +353,7 @@ function showTaskForm(task) {
       status: document.getElementById('taskStatus').value,
       progress: parseInt(document.getElementById('taskProgress').value)
     };
-    if (!data.name) return alert('請輸入任務名稱');
+    if (!data.name) return alert('請輸入科目名稱');
     if (task) {
       // 先關閉 modal 與 editingTask
       document.body.removeChild(modal);
