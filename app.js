@@ -1,4 +1,4 @@
-const adminPassword = 'admin123';
+const adminPassword = '123';
 
 let state = {
   tasks: [
