@@ -75,7 +75,7 @@ function render() {
     <div class="flex items-center gap-3">
       <h1>藥師國考進度表</h1>
       <span class="badge ${state.viewMode === 'client' ? 'in-progress' : 'completed'}">
-        ${state.viewMode === 'client' ? '客戶檢視模式' : '管理員模式'}
+        ${state.viewMode === 'client' ? '考生檢視模式' : '管理員模式'}
       </span>
     </div>
     <div class="flex gap-2 items-center">
@@ -98,8 +98,8 @@ function render() {
       <div class="flex-1">
         <strong>使用說明：</strong>
         ${state.viewMode === 'client'
-          ? '您目前處於<strong>客戶檢視模式</strong>，可以查看專案進度但無法修改任務。'
-          : '您目前處於<strong>管理員模式</strong>，可以完整管理所有任務：新增、編輯、刪除、拖拽調整時間。'}
+          ? '您目前處於<strong>考生進度觀看</strong>，可以查看教學進度但無法修改進度。'
+          : '您目前處於<strong>老師管理者模式</strong>，可以完整管理所有任務：新增、編輯、刪除、拖拽調整時間。'}
       </div>
       <div class="flex gap-2 text-xs">
         <span class="badge completed">已完成</span>
@@ -140,7 +140,7 @@ function render() {
   const left = document.createElement('div');
   left.style.width = '320px';
   left.innerHTML = `
-    <div class="bg-light p-2 rounded mb-2 font-bold">任務清單</div>
+    <div class="bg-light p-2 rounded mb-2 font-bold">科目清單</div>
     <div>
       ${state.tasks.map(task => `
         <div class="bg-white rounded p-3 mb-2 flex items-center justify-between" style="border:1px solid #f3f4f6;">
@@ -149,8 +149,8 @@ function render() {
               <span class="font-medium">${task.name}</span>
               <span class="${getStatusClass(task.status)}">${getStatusText(task.status)}</span>
             </div>
-            <div class="text-xs text-gray mt-1">${task.startDate} ~ ${task.endDate}</div>
-            <div class="text-xs text-gray mt-1">主題章節：${task.assignee}</div>
+            <div class="text-xs text-blue mt-1">${task.startDate} ~ ${task.endDate}</div>
+            <div class="text-xs text-red mt-1">主題章節：${task.assignee}</div>
             <div class="flex items-center gap-2 mt-1">
               <div style="background:#e5e7eb;width:80px;height:6px;border-radius:3px;overflow:hidden;">
                 <div style="background:#3b82f6;height:6px;width:${task.progress}%;"></div>
