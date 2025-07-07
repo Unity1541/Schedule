@@ -1,12 +1,19 @@
 const adminPassword = '1541';
 
+// Firebase 設定
+const firebaseConfig = {
+  apiKey: "AIzaSyBtYsYuz5jkqrrShZkYnp92e2lslZxBE2o",
+  authDomain: "scheduleapp-252e2.firebaseapp.com",
+  projectId: "scheduleapp-252e2",
+  storageBucket: "scheduleapp-252e2.appspot.com",
+  messagingSenderId: "500191325380",
+  appId: "1:500191325380:web:0d258cac4eaf8801a32d91"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 let state = {
-  tasks: [
-    { id: 1, name: '專案規劃', startDate: '2025-01-01', endDate: '2025-01-10', progress: 100, color: '#3b82f6', assignee: '張三', status: 'completed' },
-    { id: 2, name: '設計階段', startDate: '2025-01-08', endDate: '2025-01-20', progress: 75, color: '#10b981', assignee: '李四', status: 'in-progress' },
-    { id: 3, name: '開發階段', startDate: '2025-01-15', endDate: '2025-02-10', progress: 30, color: '#f59e0b', assignee: '王五', status: 'in-progress' },
-    { id: 4, name: '測試階段', startDate: '2025-02-05', endDate: '2025-02-20', progress: 0, color: '#ef4444', assignee: '趙六', status: 'pending' }
-  ],
+  tasks: [],
   viewMode: 'client',
   isAuthenticated: false,
   showAddForm: false,
@@ -150,7 +157,7 @@ function render() {
               <span class="${getStatusClass(task.status)}">${getStatusText(task.status)}</span>
             </div>
             <div class="text-xs text-blue mt-1">${task.startDate} ~ ${task.endDate}</div>
-            <div class="text-xs text-red mt-1">主題章節：${task.assignee}</div>
+            <div class="text-xs text-blue mt-1">主題章節：${task.assignee}</div>
             <div class="flex items-center gap-2 mt-1">
               <div style="background:#e5e7eb;width:80px;height:6px;border-radius:3px;overflow:hidden;">
                 <div style="background:#3b82f6;height:6px;width:${task.progress}%;"></div>
@@ -160,8 +167,8 @@ function render() {
           </div>
           ${state.viewMode === 'admin' ? `
             <div class="flex flex-col gap-2 ml-2">
-              <button class="gray" style="padding:2px 8px;font-size:0.9rem;" onclick="editTask(${task.id})">編輯</button>
-              <button class="danger" style="padding:2px 8px;font-size:0.9rem;" onclick="deleteTask(${task.id})">刪除</button>
+              <button class="gray" style="padding:2px 8px;font-size:0.9rem;" onclick="editTask('${task.id}')">編輯</button>
+              <button class="danger" style="padding:2px 8px;font-size:0.9rem;" onclick="deleteTask('${task.id}')">刪除</button>
             </div>
           ` : ''}
         </div>
@@ -233,7 +240,7 @@ function renderGantt() {
     html += `<div class="gantt-bar ${task.status}" 
       style="left:${startDays*30}px;width:${duration*30}px;top:8px;"
       draggable="${state.viewMode === 'admin'}"
-      onmousedown="startDrag(event,${task.id})"
+      onmousedown="startDrag(event,'${task.id}')"
       >
       <span style="flex:1">${task.name}</span>
       <span class="text-xs" style="margin-left:8px;">${task.progress}%</span>
@@ -247,7 +254,7 @@ function renderGantt() {
 // 拖拽
 function startDrag(e, taskId) {
   if (state.viewMode !== 'admin') return;
-  const task = state.tasks.find(t => t.id === taskId);
+  const task = state.tasks.find(t => t.id == taskId);
   setState({ draggedTask: task, dragStart: { x: e.clientX, startDate: task.startDate, endDate: task.endDate } });
   document.onmousemove = dragMove;
   document.onmouseup = dragEnd;
@@ -274,22 +281,20 @@ function dragEnd() {
   document.onmouseup = null;
 }
 
-// CRUD
+// CRUD (全部改為 Firestore 版本)
 function addTask(task) {
-  state.tasks.push({ ...task, id: Date.now(), color: '#6366f1' });
-  setState({ tasks: state.tasks, showAddForm: false });
+  addTaskToFirestore({ ...task, color: '#6366f1' });
+  setState({ showAddForm: false });
 }
 function updateTask(id, updates) {
-  state.tasks = state.tasks.map(t => t.id === id ? { ...t, ...updates } : t);
-  setState({ tasks: state.tasks });
+  updateTaskInFirestore(id, updates);
 }
 function deleteTask(id) {
   if (!confirm('確定要刪除這個任務嗎？')) return;
-  state.tasks = state.tasks.filter(t => t.id !== id);
-  setState({ tasks: state.tasks });
+  deleteTaskFromFirestore(id);
 }
 function editTask(id) {
-  const task = state.tasks.find(t => t.id === id);
+  const task = state.tasks.find(t => t.id == id);
   setState({ editingTask: task });
 }
 
@@ -355,7 +360,6 @@ function showTaskForm(task) {
     };
     if (!data.name) return alert('請輸入科目名稱');
     if (task) {
-      // 先關閉 modal 與 editingTask
       document.body.removeChild(modal);
       setState({ editingTask: null });
       updateTask(task.id, data);
@@ -366,8 +370,28 @@ function showTaskForm(task) {
   };
 }
 
+// Firestore 讀寫
+async function loadTasksFromFirestore() {
+  const snapshot = await db.collection('tasks').get();
+  state.tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  render();
+}
+async function addTaskToFirestore(task) {
+  await db.collection('tasks').add(task);
+  loadTasksFromFirestore();
+}
+async function updateTaskInFirestore(id, updates) {
+  await db.collection('tasks').doc(id).update(updates);
+  loadTasksFromFirestore();
+}
+async function deleteTaskFromFirestore(id) {
+  await db.collection('tasks').doc(id).delete();
+  loadTasksFromFirestore();
+}
+
 window.editTask = editTask;
 window.deleteTask = deleteTask;
 window.startDrag = startDrag;
 
-render();
+// 載入 Firestore 資料
+loadTasksFromFirestore();
