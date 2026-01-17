@@ -107,6 +107,18 @@ h4 {
 /* Utilities */
 .m-0 { margin: 0; }
 .text-sm { font-size: 0.875rem; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.font-normal { font-weight: 400; }
+.block { display: block; }
+.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+
+/* Color Utilities */
+.text-muted { color: var(--text-muted); }
+.text-main { color: var(--text-main); }
+.text-green { color: var(--success); }
+.text-yellow { color: var(--warning); }
+.text-gray { color: var(--pending); }
 
 /* Components */
 .card {
@@ -340,7 +352,7 @@ input:focus, select:focus {
 @media (max-width: 1024px) {
   .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
   .flex-col-mobile { flex-direction: column; }
-  /* .w-full-mobile { width: 100%; } Removed in favor of specific classes */
+  .w-full-mobile { width: 100% !important; }
   .sidebar { width: 100% !important; }
 }
 
