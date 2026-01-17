@@ -505,9 +505,14 @@ window.startDrag = startDrag;
 
 // Firestore Operations - Tasks
 async function loadTasksFromFirestore() {
-  const snapshot = await db.collection('tasks').get();
-  state.tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  render();
+  try {
+    const snapshot = await db.collection('tasks').get();
+    state.tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    render();
+  } catch (error) {
+    console.error("Error loading tasks:", error);
+    alert("無法讀取任務列表，請檢查網路或權限。錯誤: " + error.message);
+  }
 }
 async function addTaskToFirestore(task) {
   await db.collection('tasks').add(task);
@@ -524,9 +529,14 @@ async function deleteTaskFromFirestore(id) {
 
 // Firestore Operations - Posts
 async function loadPostsFromFirestore() {
-    const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
-    state.posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    render();
+    try {
+        const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
+        state.posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        render();
+    } catch (error) {
+        console.error("Error loading posts:", error);
+        alert("無法讀取公告欄，請檢查網路或是 Firebase 權限設定。錯誤: " + error.message);
+    }
 }
 async function addPostToFirestore(post) {
     // Add server timestamp using the Firebase SDK client-side
@@ -583,5 +593,21 @@ window.cancelEditPost = () => {
 window.deletePost = deletePostFromFirestore;
 
 // Init
-loadTasksFromFirestore();
-loadPostsFromFirestore();
+try {
+  loadTasksFromFirestore();
+  loadPostsFromFirestore();
+} catch (error) {
+  console.error(error);
+  alert('Critical Error during initialization: ' + error.message);
+}
+
+// Global Render Safety
+const originalRender = render;
+render = function() {
+    try {
+        originalRender();
+    } catch (e) {
+        console.error(e);
+        alert('Render Error: ' + e.message);
+    }
+}
